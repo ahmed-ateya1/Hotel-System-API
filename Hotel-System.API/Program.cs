@@ -1,4 +1,7 @@
 
+using Hotel_System.API.Startup;
+using Serilog;
+
 namespace Hotel_System.API
 {
     public class Program
@@ -8,11 +11,12 @@ namespace Hotel_System.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            //Log.Logger = new LoggerConfiguration().MinimumLevel.Debug()
+            //    .WriteTo.File("log/villalogs.txt", rollingInterval: RollingInterval.Day).CreateLogger();
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Host.UseSerilog();
+
+            builder.Services.ServicesConfiguration(builder.Configuration);
 
             var app = builder.Build();
 
