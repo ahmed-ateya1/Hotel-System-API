@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Hotel_System.Core.Domain.Entites;
 using Hotel_System.Core.DTO;
-using Hotel_System.Infrastructure.Data;
-using Microsoft.AspNetCore.JsonPatch;
+using Hotel_System.Core.ServiceContracts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System.Net;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Hotel_System.API.Controllers
 {
@@ -12,145 +15,157 @@ namespace Hotel_System.API.Controllers
     public class VillaController : ControllerBase
     {
         private readonly ILogger<VillaController> _logger;
-        private readonly ApplicationDbContext _db;
+        private readonly IVillaServices _villaService;
         private readonly IMapper _mapper;
-        public VillaController(ILogger<VillaController> logger, IMapper mapper, ApplicationDbContext db)
+
+        public VillaController(ILogger<VillaController> logger, IMapper mapper, IVillaServices villaService)
         {
             _logger = logger;
-            _db = db;
+            _villaService = villaService;
             _mapper = mapper;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<VillaResponse>> GetVillas()
+        public async Task<ActionResult<APIResponse>> GetVillas()
         {
-            _logger.LogInformation("Getting all villas.");
-            var listVilla = _db.Villas.ToList();    
-            return Ok(_mapper.Map<List<VillaResponse>>(listVilla));
+            var response = new APIResponse();
+            try
+            {
+                _logger.LogInformation("Getting all villas.");
+                var listVilla = await _villaService.GetAllAysnc(); // Corrected with await
+                response.StatusCode = HttpStatusCode.OK;
+                response.Result = listVilla;
+                response.IsSuccess = true;
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { ex.Message };
+                response.StatusCode = HttpStatusCode.InternalServerError;
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
         }
 
         [HttpGet("{id:Guid}", Name = "GetVilla")]
-        public ActionResult<VillaResponse> GetVilla(Guid? id)
+        public async Task<ActionResult<APIResponse>> GetVilla(Guid id)
         {
-            if (!id.HasValue)
+            var response = new APIResponse();
+            try
             {
-                _logger.LogWarning("Invalid ID provided for GetVilla: {Id}", id);
-                return BadRequest();
-            }
+                var villa = await _villaService.GetByAsync(x => x.VillaID == id); // Ensure await usage
 
-            var villa = _db.Villas.FirstOrDefault(x => x.VillaID == id);
-            if (villa == null)
+                if (villa == null)
+                {
+                    _logger.LogInformation("Villa not found with ID: {Id}", id);
+                    response.StatusCode = HttpStatusCode.NotFound;
+                    response.IsSuccess = false;
+                    return NotFound(response);
+                }
+
+                _logger.LogInformation("Retrieved villa with ID: {Id}", id);
+                response.Result = villa;
+                response.StatusCode = HttpStatusCode.OK;
+                response.IsSuccess = true;
+                return Ok(response);
+            }
+            catch (Exception ex)
             {
-                _logger.LogInformation("Villa not found with ID: {Id}", id);
-                return NotFound();
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { ex.Message };
+                response.StatusCode = HttpStatusCode.InternalServerError;
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
-
-            _logger.LogInformation("Retrieved villaAddRequest with ID: {Id}", id);
-            return Ok(_mapper.Map<VillaResponse>(villa));
         }
 
         [HttpPost("createVilla")]
-        public IActionResult CreateVilla(VillaAddRequest villaAddRequest)
+        public async Task<ActionResult<APIResponse>> CreateVilla([FromBody] VillaAddRequest villaAddRequest)
         {
-            if (villaAddRequest == null)
+            var response = new APIResponse();
+            try
             {
-                _logger.LogWarning("CreateVilla request received with null villaAddRequest object.");
-                return BadRequest();
+                if (villaAddRequest == null)
+                {
+                    _logger.LogWarning("CreateVilla request received with null villaAddRequest object.");
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    response.IsSuccess = false;
+                    return BadRequest(response);
+                }
+
+                var villaResponse = await _villaService.CreateVillaAsync(villaAddRequest);
+                response.Result = villaResponse;
+                response.StatusCode = HttpStatusCode.Created;
+                response.IsSuccess = true;
+                _logger.LogInformation("Created new villa with ID: {VillaID}", villaResponse.VillaID);
+                return CreatedAtRoute("GetVilla", new { id = villaResponse.VillaID }, response);
             }
-            var villaReponse = _mapper.Map<VillaResponse>(villaAddRequest);
-
-            villaReponse.VillaID = Guid.NewGuid();
-            var villa = _mapper.Map<Villa>(villaReponse);
-            _db.Villas.Add(villa);
-            _db.SaveChanges();
-
-            _logger.LogInformation("Created new villaAddRequest with ID: {VillaID}", villa.VillaID);
-            return CreatedAtRoute("GetVilla", new { id = villa.VillaID }, villaAddRequest);
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { ex.Message };
+                response.StatusCode = HttpStatusCode.InternalServerError;
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
         }
 
         [HttpPut("{id:Guid}")]
-        public IActionResult UpdateVilla(Guid? id, [FromBody] Villa villa)
+        public async Task<ActionResult<APIResponse>> UpdateVilla(Guid id, [FromBody] VillaUpdateRequest villaUpdate)
         {
-            if (villa == null || !id.HasValue)
+            var response = new APIResponse();
+            try
             {
-                _logger.LogWarning("UpdateVilla request received with null villaAddRequest object or missing ID.");
-                return BadRequest();
-            }
+                if (villaUpdate == null || id != villaUpdate.VillaID)
+                {
+                    _logger.LogWarning("UpdateVilla request received with invalid data.");
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    response.IsSuccess = false;
+                    return BadRequest(response);
+                }
 
-            var oldVilla = _db.Villas.FirstOrDefault(x => x.VillaID == id);
-            if (oldVilla == null)
+                var villaResponse = await _villaService.UpdateVillaAsync(villaUpdate);
+                response.StatusCode = HttpStatusCode.NoContent;
+                response.IsSuccess = true;
+                _logger.LogInformation("Updated villa with ID: {Id}", id);
+                return NoContent();
+            }
+            catch (Exception ex)
             {
-                _logger.LogInformation("Villa not found for update with ID: {Id}", id);
-                return NotFound();
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { ex.Message };
+                response.StatusCode = HttpStatusCode.InternalServerError;
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
-
-            oldVilla.VillaName = villa.VillaName;
-            oldVilla.Occupancy = villa.Occupancy;
-            oldVilla.Sqft = villa.Sqft;
-            oldVilla.Rate = villa.Rate;
-            oldVilla.UpdatedDate = villa.UpdatedDate;
-            oldVilla.VillaDescription = villa.VillaDescription;
-            oldVilla.Amenity = villa.Amenity;
-
-            _db.Update(oldVilla);
-            _db.SaveChanges();  
-
-            _logger.LogInformation("Updated villaAddRequest with ID: {Id}", id);
-            return NoContent();
         }
 
         [HttpDelete("{id:Guid}")]
-        public IActionResult DeleteVilla(Guid? id)
+        public async Task<ActionResult<APIResponse>> DeleteVilla(Guid id)
         {
-            if (!id.HasValue)
+            var response = new APIResponse();
+            try
             {
-                _logger.LogWarning("DeleteVilla request received with missing ID.");
-                return BadRequest();
-            }
+                var villa = await _villaService.GetByAsync(x => x.VillaID == id); // Ensure await usage
 
-            var villa = _db.Villas.FirstOrDefault(x => x.VillaID == id);
-            if (villa == null)
+                if (villa == null)
+                {
+                    _logger.LogInformation("Villa not found for deletion with ID: {Id}", id);
+                    response.StatusCode = HttpStatusCode.NotFound;
+                    response.IsSuccess = false;
+                    return NotFound(response);
+                }
+
+                await _villaService.DeleteVillaAsync(id); // Add await here for delete async
+                _logger.LogInformation("Deleted villa with ID: {Id}", id);
+                response.StatusCode = HttpStatusCode.NoContent;
+                response.IsSuccess = true;
+                return NoContent();
+            }
+            catch (Exception ex)
             {
-                _logger.LogInformation("Villa not found for deletion with ID: {Id}", id);
-                return NotFound();
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { ex.Message };
+                response.StatusCode = HttpStatusCode.InternalServerError;
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
-
-            _db.Villas.Remove(villa);
-            _db.SaveChanges();
-            _logger.LogInformation("Deleted villaAddRequest with ID: {Id}", id);
-            return NoContent();
         }
-
-        [HttpPatch("{id:Guid}")]
-        public IActionResult UpdatePartialVilla(Guid? id, JsonPatchDocument<Villa> patch)
-        {
-            if (!id.HasValue || patch == null)
-            {
-                _logger.LogWarning("UpdatePartialVilla request received with invalid ID or patch document.");
-                return BadRequest("Invalid ID or patch document.");
-            }
-
-            var villa = _db.Villas.FirstOrDefault(x => x.VillaID == id);
-            if (villa == null)
-            {
-                _logger.LogInformation("Villa not found for partial update with ID: {Id}", id);
-                return NotFound("Villa not found.");
-            }
-
-            patch.ApplyTo(villa, ModelState);
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Invalid ModelState after applying patch to villaAddRequest with ID: {Id}", id);
-                return BadRequest(ModelState);
-            }
-
-            _db.Update(villa);
-            _db.SaveChanges();
-
-            _logger.LogInformation("Partially updated villaAddRequest with ID: {Id}", id);
-            return NoContent();
-        }
-
     }
 }

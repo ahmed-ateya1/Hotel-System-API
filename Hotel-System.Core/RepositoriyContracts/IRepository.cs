@@ -10,8 +10,8 @@ namespace Hotel_System.Core.RepositoriyContracts
 {
     public interface IRepository<T> where T : class
     {
-        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> filter = null);
-        Task<T> GetByAsync(Expression<Func<T, bool>> filter = null, bool isTracked = true);
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null);
+        Task<T> GetByAsync(Expression<Func<T, bool>>? filter = null, bool isTracked = true);
         Task<T> CreateAsync(T model);
         Task<bool> DeleteAsync(T model);
         Task SaveAsync();

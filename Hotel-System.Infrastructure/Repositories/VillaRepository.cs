@@ -28,6 +28,7 @@ namespace Hotel_System.Infrastructure.Repositories
 
             if (oldVilla == null) return null;
 
+            villa.UpdatedDate = DateTime.UtcNow;
             _mapper.Map(villa, oldVilla);
 
             await SaveAsync();

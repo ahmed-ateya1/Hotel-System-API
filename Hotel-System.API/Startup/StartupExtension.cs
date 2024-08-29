@@ -1,6 +1,9 @@
 ﻿using Hotel_System.Core;
+using Hotel_System.Core.RepositoriyContracts;
+using Hotel_System.Core.ServiceContracts;
+using Hotel_System.Core.Services;
 using Hotel_System.Infrastructure.Data;
-
+using Hotel_System.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_System.API.Startup
@@ -13,6 +16,9 @@ namespace Hotel_System.API.Startup
             {
                 options.UseSqlServer(configuration.GetConnectionString("connstr"));
             });
+            services.AddScoped<IVillaRepository , VillaRepository>();
+            services.AddScoped<IVillaServices, VillaServices>();
+
             services.AddAutoMapper(typeof(MappingConfig));
             services.AddControllers().AddNewtonsoftJson();
             services.AddEndpointsApiExplorer();

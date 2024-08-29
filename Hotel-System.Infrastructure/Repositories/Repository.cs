@@ -39,7 +39,7 @@ namespace Hotel_System.Infrastructure.Repositories
             return true; 
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> filter = null)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
         {
             IQueryable<T> query =  _dbSet;
 
@@ -49,7 +49,7 @@ namespace Hotel_System.Infrastructure.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<T> GetByAsync(Expression<Func<T, bool>> filter = null, bool isTracked = true)
+        public async Task<T> GetByAsync(Expression<Func<T, bool>>? filter = null, bool isTracked = true)
         {
             IQueryable<T> query = _dbSet;
             if (!isTracked)
