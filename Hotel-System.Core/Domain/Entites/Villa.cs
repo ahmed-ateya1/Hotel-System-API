@@ -18,5 +18,6 @@ namespace Hotel_System.Core.Domain.Entites
         public string Amenity { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedDate { get; set; }
+        public ICollection<VillaNumber> VillaNumbers { get; set; } = new List<VillaNumber>();
     }
 }

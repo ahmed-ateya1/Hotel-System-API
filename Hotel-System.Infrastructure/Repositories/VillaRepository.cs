@@ -22,7 +22,7 @@ namespace Hotel_System.Infrastructure.Repositories
             _mapper = mapper;
         }
 
-        public async Task<Villa> UpdateVillaAsync(Villa villa)
+        public async Task<Villa> UpdateAsync(Villa villa)
         {
             var oldVilla = await GetByAsync(x=>x.VillaID == villa.VillaID);
 

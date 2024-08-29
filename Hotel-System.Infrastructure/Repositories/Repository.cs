@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Hotel_System.Infrastructure.Repositories
@@ -19,7 +18,7 @@ namespace Hotel_System.Infrastructure.Repositories
         public Repository(ApplicationDbContext db)
         {
             _db = db;
-            this._dbSet = _db.Set<T>();
+            _dbSet = _db.Set<T>();
         }
 
         public async Task<T> CreateAsync(T model)
@@ -36,20 +35,25 @@ namespace Hotel_System.Infrastructure.Repositories
             if (model == null) return false;
             _dbSet.Remove(model);
             await SaveAsync();
-            return true; 
+            return true;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string includeProperties = "")
         {
-            IQueryable<T> query =  _dbSet;
+            IQueryable<T> query = _dbSet;
 
             if (filter != null)
                 query = query.Where(filter);
 
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
             return await query.ToListAsync();
         }
 
-        public async Task<T> GetByAsync(Expression<Func<T, bool>>? filter = null, bool isTracked = true)
+        public async Task<T> GetByAsync(Expression<Func<T, bool>>? filter = null, bool isTracked = true, string includeProperties = "")
         {
             IQueryable<T> query = _dbSet;
             if (!isTracked)
@@ -57,7 +61,12 @@ namespace Hotel_System.Infrastructure.Repositories
             if (filter != null)
                 query = query.Where(filter);
 
-            return await query.FirstOrDefaultAsync();
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.FirstOrDefaultAsync(filter);
         }
 
         public async Task SaveAsync()

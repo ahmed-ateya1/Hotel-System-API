@@ -13,6 +13,7 @@ namespace Hotel_System.Infrastructure.Data
     public class ApplicationDbContext : DbContext
     {
         public DbSet<Villa> Villas { get; set; }
+        public DbSet<VillaNumber> VillaNumbers { get; set; }
         public ApplicationDbContext(DbContextOptions options):base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

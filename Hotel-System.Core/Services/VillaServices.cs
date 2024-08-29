@@ -111,7 +111,7 @@ namespace Hotel_System.Core.Services
 
             var updatedVilla = _mapper.Map(villaUpdate, existingVilla);
 
-            await _villaRepository.UpdateVillaAsync(updatedVilla);
+            await _villaRepository.UpdateAsync(updatedVilla);
 
             _logger.LogInformation("Villa updated successfully with ID: {VillaID}", updatedVilla.VillaID);
 

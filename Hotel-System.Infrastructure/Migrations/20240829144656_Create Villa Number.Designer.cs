@@ -4,6 +4,7 @@ using Hotel_System.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hotel_System.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240829144656_Create Villa Number")]
+    partial class CreateVillaNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,7 +70,7 @@ namespace Hotel_System.Infrastructure.Migrations
                         {
                             VillaID = new Guid("9b53e271-19fd-4b84-a14c-598e536ea22c"),
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 8, 29, 17, 24, 22, 371, DateTimeKind.Utc).AddTicks(3974),
+                            CreatedDate = new DateTime(2024, 8, 29, 14, 46, 56, 291, DateTimeKind.Utc).AddTicks(9531),
                             ImageURL = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa3.jpg",
                             Occupancy = 4,
                             Rate = 200.0,
@@ -80,7 +83,7 @@ namespace Hotel_System.Infrastructure.Migrations
                         {
                             VillaID = new Guid("bcfad10a-d4fc-44f1-b5b1-0f5aa2c66147"),
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 8, 29, 17, 24, 22, 371, DateTimeKind.Utc).AddTicks(3989),
+                            CreatedDate = new DateTime(2024, 8, 29, 14, 46, 56, 291, DateTimeKind.Utc).AddTicks(9550),
                             ImageURL = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa1.jpg",
                             Occupancy = 4,
                             Rate = 300.0,
@@ -93,7 +96,7 @@ namespace Hotel_System.Infrastructure.Migrations
                         {
                             VillaID = new Guid("aef0a7d2-1e79-4bdf-8d3e-b46de9f8656e"),
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 8, 29, 17, 24, 22, 371, DateTimeKind.Utc).AddTicks(3992),
+                            CreatedDate = new DateTime(2024, 8, 29, 14, 46, 56, 291, DateTimeKind.Utc).AddTicks(9553),
                             ImageURL = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa4.jpg",
                             Occupancy = 4,
                             Rate = 400.0,
@@ -106,7 +109,7 @@ namespace Hotel_System.Infrastructure.Migrations
                         {
                             VillaID = new Guid("6e6fe821-13d2-4567-b674-f616d79e264a"),
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 8, 29, 17, 24, 22, 371, DateTimeKind.Utc).AddTicks(3995),
+                            CreatedDate = new DateTime(2024, 8, 29, 14, 46, 56, 291, DateTimeKind.Utc).AddTicks(9556),
                             ImageURL = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa5.jpg",
                             Occupancy = 4,
                             Rate = 550.0,
@@ -119,7 +122,7 @@ namespace Hotel_System.Infrastructure.Migrations
                         {
                             VillaID = new Guid("02454e31-1236-4b7b-805f-7ecec9856090"),
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 8, 29, 17, 24, 22, 371, DateTimeKind.Utc).AddTicks(3998),
+                            CreatedDate = new DateTime(2024, 8, 29, 14, 46, 56, 291, DateTimeKind.Utc).AddTicks(9559),
                             ImageURL = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa2.jpg",
                             Occupancy = 4,
                             Rate = 600.0,
@@ -145,30 +148,9 @@ namespace Hotel_System.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("VillaID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("VillaNum");
 
-                    b.HasIndex("VillaID");
-
                     b.ToTable("VillaNumbers");
-                });
-
-            modelBuilder.Entity("Hotel_System.Core.Domain.Entites.VillaNumber", b =>
-                {
-                    b.HasOne("Hotel_System.Core.Domain.Entites.Villa", "Villa")
-                        .WithMany("VillaNumbers")
-                        .HasForeignKey("VillaID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Villa");
-                });
-
-            modelBuilder.Entity("Hotel_System.Core.Domain.Entites.Villa", b =>
-                {
-                    b.Navigation("VillaNumbers");
                 });
 #pragma warning restore 612, 618
         }

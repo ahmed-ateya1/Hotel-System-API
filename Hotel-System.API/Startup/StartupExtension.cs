@@ -18,7 +18,8 @@ namespace Hotel_System.API.Startup
             });
             services.AddScoped<IVillaRepository , VillaRepository>();
             services.AddScoped<IVillaServices, VillaServices>();
-
+            services.AddScoped<IVillaNumberRepository , VillaNumberRepository>();
+            services.AddScoped<IVillaNumberServices , VillaNumberServices>();
             services.AddAutoMapper(typeof(MappingConfig));
             services.AddControllers().AddNewtonsoftJson();
             services.AddEndpointsApiExplorer();

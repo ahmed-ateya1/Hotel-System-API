@@ -43,6 +43,11 @@ namespace Hotel_System.Infrastructure.Configuration
 
             builder.Property(x=>x.UpdatedDate)
                 .IsRequired();
+
+            builder.HasMany(x=>x.VillaNumbers)
+                .WithOne(x=>x.Villa)
+                .HasForeignKey(x=>x.VillaID)
+                .OnDelete(DeleteBehavior.Cascade);
             builder.HasData(new Villa
             {
                 VillaID = Guid.Parse("9B53E271-19FD-4B84-A14C-598E536EA22C"),

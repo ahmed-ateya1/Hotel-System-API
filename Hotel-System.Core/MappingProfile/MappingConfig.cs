@@ -13,12 +13,20 @@ namespace Hotel_System.Core
     {
         public MappingConfig()
         {
+           
             CreateMap<VillaAddRequest, Villa>().ReverseMap();
             CreateMap<VillaUpdateRequest, Villa>().ReverseMap();
             CreateMap<VillaResponse, Villa>().ReverseMap();
             CreateMap<VillaAddRequest, VillaResponse>().ReverseMap();
             CreateMap<VillaUpdateRequest, VillaResponse>().ReverseMap();
             CreateMap<Villa, Villa>();
+            CreateMap<VillaNumber, VillaNumber>();
+            CreateMap<VillaNumberAddRequest, VillaNumber>().ReverseMap();
+            CreateMap<VillaNumberUpdateRequest, VillaNumber>().ReverseMap();
+            CreateMap<VillaNumberUpdateRequest , VillaResponse>().ReverseMap();
+            CreateMap<VillaNumber, VillaNumberResponse>()
+            .ForMember(dest => dest.VillaName, opt => opt.MapFrom(src => src.Villa.VillaName)).ReverseMap();
+            CreateMap<VillaNumberAddRequest , VillaNumberResponse>().ReverseMap();
         }
     }
 }
