@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hotel_System.Core.Domain.Entites
+namespace Hotel_System.Core.DTO
 {
-    public class Villa
+    public class VillaResponse
     {
         public Guid VillaID { get; set; }
         public string VillaName { get; set; }
@@ -16,7 +16,7 @@ namespace Hotel_System.Core.Domain.Entites
         public int Occupancy { get; set; }
         public string ImageURL { get; set; }
         public string Amenity { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
     }
 }

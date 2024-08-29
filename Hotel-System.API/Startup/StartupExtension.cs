@@ -1,4 +1,5 @@
-﻿using Hotel_System.Infrastructure.Data;
+﻿using Hotel_System.Core;
+using Hotel_System.Infrastructure.Data;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ namespace Hotel_System.API.Startup
             {
                 options.UseSqlServer(configuration.GetConnectionString("connstr"));
             });
+            services.AddAutoMapper(typeof(MappingConfig));
             services.AddControllers().AddNewtonsoftJson();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();

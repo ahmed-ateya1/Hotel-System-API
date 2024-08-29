@@ -1,4 +1,6 @@
-﻿using Hotel_System.Core.Domain.Entites;
+﻿using AutoMapper;
+using Hotel_System.Core.Domain.Entites;
+using Hotel_System.Core.DTO;
 using Hotel_System.Infrastructure.Data;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -11,22 +13,24 @@ namespace Hotel_System.API.Controllers
     {
         private readonly ILogger<VillaController> _logger;
         private readonly ApplicationDbContext _db;
-
-        public VillaController(ILogger<VillaController> logger , ApplicationDbContext db)
+        private readonly IMapper _mapper;
+        public VillaController(ILogger<VillaController> logger, IMapper mapper, ApplicationDbContext db)
         {
             _logger = logger;
             _db = db;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Villa>> GetVillas()
+        public ActionResult<IEnumerable<VillaResponse>> GetVillas()
         {
             _logger.LogInformation("Getting all villas.");
-            return Ok(_db.Villas.ToList());
+            var listVilla = _db.Villas.ToList();    
+            return Ok(_mapper.Map<List<VillaResponse>>(listVilla));
         }
 
         [HttpGet("{id:Guid}", Name = "GetVilla")]
-        public ActionResult<Villa> GetVilla(Guid? id)
+        public ActionResult<VillaResponse> GetVilla(Guid? id)
         {
             if (!id.HasValue)
             {
@@ -41,26 +45,27 @@ namespace Hotel_System.API.Controllers
                 return NotFound();
             }
 
-            _logger.LogInformation("Retrieved villa with ID: {Id}", id);
-            return Ok(villa);
+            _logger.LogInformation("Retrieved villaAddRequest with ID: {Id}", id);
+            return Ok(_mapper.Map<VillaResponse>(villa));
         }
 
         [HttpPost("createVilla")]
-        public IActionResult CreateVilla(Villa villa)
+        public IActionResult CreateVilla(VillaAddRequest villaAddRequest)
         {
-            if (villa == null)
+            if (villaAddRequest == null)
             {
-                _logger.LogWarning("CreateVilla request received with null villa object.");
+                _logger.LogWarning("CreateVilla request received with null villaAddRequest object.");
                 return BadRequest();
             }
+            var villaReponse = _mapper.Map<VillaResponse>(villaAddRequest);
 
-
-            villa.VillaID = Guid.NewGuid();
+            villaReponse.VillaID = Guid.NewGuid();
+            var villa = _mapper.Map<Villa>(villaReponse);
             _db.Villas.Add(villa);
             _db.SaveChanges();
 
-            _logger.LogInformation("Created new villa with ID: {VillaID}", villa.VillaID);
-            return CreatedAtRoute("GetVilla", new { id = villa.VillaID }, villa);
+            _logger.LogInformation("Created new villaAddRequest with ID: {VillaID}", villa.VillaID);
+            return CreatedAtRoute("GetVilla", new { id = villa.VillaID }, villaAddRequest);
         }
 
         [HttpPut("{id:Guid}")]
@@ -68,7 +73,7 @@ namespace Hotel_System.API.Controllers
         {
             if (villa == null || !id.HasValue)
             {
-                _logger.LogWarning("UpdateVilla request received with null villa object or missing ID.");
+                _logger.LogWarning("UpdateVilla request received with null villaAddRequest object or missing ID.");
                 return BadRequest();
             }
 
@@ -90,7 +95,7 @@ namespace Hotel_System.API.Controllers
             _db.Update(oldVilla);
             _db.SaveChanges();  
 
-            _logger.LogInformation("Updated villa with ID: {Id}", id);
+            _logger.LogInformation("Updated villaAddRequest with ID: {Id}", id);
             return NoContent();
         }
 
@@ -112,7 +117,7 @@ namespace Hotel_System.API.Controllers
 
             _db.Villas.Remove(villa);
             _db.SaveChanges();
-            _logger.LogInformation("Deleted villa with ID: {Id}", id);
+            _logger.LogInformation("Deleted villaAddRequest with ID: {Id}", id);
             return NoContent();
         }
 
@@ -136,14 +141,14 @@ namespace Hotel_System.API.Controllers
 
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Invalid ModelState after applying patch to villa with ID: {Id}", id);
+                _logger.LogWarning("Invalid ModelState after applying patch to villaAddRequest with ID: {Id}", id);
                 return BadRequest(ModelState);
             }
 
             _db.Update(villa);
             _db.SaveChanges();
 
-            _logger.LogInformation("Partially updated villa with ID: {Id}", id);
+            _logger.LogInformation("Partially updated villaAddRequest with ID: {Id}", id);
             return NoContent();
         }
 
