@@ -23,7 +23,10 @@ namespace Hotel_System.API.Startup
             services.AddAutoMapper(typeof(MappingConfig));
             services.AddControllers().AddNewtonsoftJson();
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(options =>
+            {
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "apidocumnent.xml"));
+            });
 
             return services;
         }

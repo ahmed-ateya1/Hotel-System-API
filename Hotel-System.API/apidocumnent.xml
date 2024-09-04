@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Hotel-System.API</name>
+    </assembly>
+    <members>
+        <member name="T:Hotel_System.API.Controllers.VillaController">
+            <summary>
+            API Controller for managing villa-related operations.
+            </summary>
+        </member>
+        <member name="M:Hotel_System.API.Controllers.VillaController.#ctor(Microsoft.Extensions.Logging.ILogger{Hotel_System.API.Controllers.VillaController},AutoMapper.IMapper,Hotel_System.Core.ServiceContracts.IVillaServices)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Hotel_System.API.Controllers.VillaController"/> class.
+            </summary>
+            <param name="logger">The logger instance.</param>
+            <param name="mapper">The AutoMapper instance.</param>
+            <param name="villaService">The villa service instance for handling business logic.</param>
+        </member>
+        <member name="M:Hotel_System.API.Controllers.VillaController.GetVillas">
+            <summary>
+            Retrieves all villas.
+            </summary>
+            <returns>A list of villas wrapped in an <see cref="T:Hotel_System.Core.DTO.APIResponse"/>.</returns>
+        </member>
+        <member name="M:Hotel_System.API.Controllers.VillaController.GetVilla(System.Guid)">
+            <summary>
+            Retrieves a specific villa by its ID.
+            </summary>
+            <param name="id">The unique identifier of the villa.</param>
+            <returns>The villa details wrapped in an <see cref="T:Hotel_System.Core.DTO.APIResponse"/>.</returns>
+        </member>
+        <member name="M:Hotel_System.API.Controllers.VillaController.CreateVilla(Hotel_System.Core.DTO.VillaAddRequest)">
+            <summary>
+            Creates a new villa.
+            </summary>
+            <param name="villaAddRequest">The request object containing villa details.</param>
+            <returns>The created villa details wrapped in an <see cref="T:Hotel_System.Core.DTO.APIResponse"/>.</returns>
+        </member>
+        <member name="M:Hotel_System.API.Controllers.VillaController.UpdateVilla(System.Guid,Hotel_System.Core.DTO.VillaUpdateRequest)">
+            <summary>
+            Updates an existing villa.
+            </summary>
+            <param name="id">The unique identifier of the villa to be updated.</param>
+            <param name="villaUpdate">The request object containing updated villa details.</param>
+            <returns>An <see cref="T:Hotel_System.Core.DTO.APIResponse"/> indicating the result of the update operation.</returns>
+        </member>
+        <member name="M:Hotel_System.API.Controllers.VillaController.DeleteVilla(System.Guid)">
+            <summary>
+            Deletes a specific villa by its ID.
+            </summary>
+            <param name="id">The unique identifier of the villa to be deleted.</param>
+            <returns>An <see cref="T:Hotel_System.Core.DTO.APIResponse"/> indicating the result of the delete operation.</returns>
+        </member>
+    </members>
+</doc>
